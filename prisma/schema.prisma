@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum EstadoApertura {
+  ABIERTO
+  CERRADO
+}
+
+enum EstadoTransferencia {
+  PENDIENTE
+  ACEPTADO
+  RECHAZADO
+}
+
+model AnioFiscal {
+  idAnioFiscal Int      @id @default(autoincrement()) @map("id_anio_fiscal")
+  nombre       String   @db.VarChar(100)
+  fechaInicio  DateTime @map("fecha_inicio") @db.Date
+  fechaFin     DateTime @map("fecha_fin") @db.Date
+  estado       Int      @default(1)
+  createdBy    Int?     @map("created_by")
+  updatedBy    Int?     @map("updated_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  cajas Caja[]
+
+  @@map("anio_fiscal")
+}
+
+model TipoCaja {
+  idTipoCaja Int      @id @default(autoincrement()) @map("id_tipo_caja")
+  nombre     String   @db.VarChar(100)
+  codigo     String?  @db.VarChar(20)
+  estado     Int      @default(1)
+  createdBy  Int?     @map("created_by")
+  updatedBy  Int?     @map("updated_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  cajas Caja[]
+
+  @@map("tipo_caja")
+}
+
+model Caja {
+  idCaja       Int    @id @default(autoincrement()) @map("id_caja")
+  idTipoCaja   Int    @map("id_tipo_caja")
+  idAnioFiscal Int    @map("id_anio_fiscal")
+  nombre       String @db.VarChar(100)
+  descripcion  String? @db.VarChar(255)
+  estado       Int    @default(1)
+  createdBy    Int?   @map("created_by")
+  updatedBy    Int?   @map("updated_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  tipoCaja              TipoCaja             @relation(fields: [idTipoCaja], references: [idTipoCaja])
+  anioFiscal            AnioFiscal           @relation(fields: [idAnioFiscal], references: [idAnioFiscal])
+  aperturas             AperturaCierreCaja[]
+  movimientos           MovimientoCaja[]
+  transferenciasEnvio   TransferenciaCaja[]  @relation("TransferenciaEnvio")
+  transferenciasRecibidas TransferenciaCaja[] @relation("TransferenciaRecepcion")
+
+  @@map("caja")
+}
+
+model AperturaCierreCaja {
+  idApertura    Int             @id @default(autoincrement()) @map("id_apertura")
+  idCaja        Int             @map("id_caja")
+  fechaApertura DateTime        @default(now()) @map("fecha_apertura")
+  fechaCierre   DateTime?       @map("fecha_cierre")
+  montoInicial  Decimal         @map("monto_inicial") @db.Decimal(18, 2)
+  montoFinal    Decimal?        @map("monto_final") @db.Decimal(18, 2)
+  observacion   String?         @db.VarChar(500)
+  estado        EstadoApertura  @default(ABIERTO)
+  createdBy     Int?            @map("created_by")
+  updatedBy     Int?            @map("updated_by")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  caja Caja @relation(fields: [idCaja], references: [idCaja])
+
+  @@map("apertura_cierre_caja")
+}
+
+model TipoMovimientoCaja {
+  idTipoMovimiento Int      @id @default(autoincrement()) @map("id_tipo_movimiento")
+  nombre           String   @db.VarChar(50)
+  descripcion      String?  @db.VarChar(255)
+  estado           Int      @default(1)
+  createdBy        Int?     @map("created_by")
+  updatedBy        Int?     @map("updated_by")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  movimientos MovimientoCaja[]
+
+  @@map("tipo_movimiento_caja")
+}
+
+model MovimientoCaja {
+  idMovimiento    Int     @id @default(autoincrement()) @map("id_movimiento")
+  idCaja          Int     @map("id_caja")
+  idTipoMovimiento Int    @map("id_tipo_movimiento")
+  monto           Decimal @db.Decimal(18, 2)
+  motivo          String? @db.VarChar(500)
+  fechaMovimiento DateTime @default(now()) @map("fecha_movimiento")
+  estado          Int     @default(1)
+  createdBy       Int?    @map("created_by")
+  updatedBy       Int?    @map("updated_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  caja           Caja             @relation(fields: [idCaja], references: [idCaja])
+  tipoMovimiento TipoMovimientoCaja @relation(fields: [idTipoMovimiento], references: [idTipoMovimiento])
+
+  @@map("movimiento_caja")
+}
+
+model TransferenciaCaja {
+  idTransferencia    Int                 @id @default(autoincrement()) @map("id_transferencia")
+  idCajaEnvio        Int                 @map("id_caja_envio")
+  idCajaRecepcion    Int                 @map("id_caja_recepcion")
+  monto              Decimal             @db.Decimal(18, 2)
+  estado             EstadoTransferencia @default(PENDIENTE)
+  observacion        String?             @db.VarChar(500)
+  fechaTransferencia DateTime            @default(now()) @map("fecha_transferencia")
+  createdBy          Int?                @map("created_by")
+  updatedBy          Int?                @map("updated_by")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  cajaEnvio     Caja @relation("TransferenciaEnvio", fields: [idCajaEnvio], references: [idCaja])
+  cajaRecepcion Caja @relation("TransferenciaRecepcion", fields: [idCajaRecepcion], references: [idCaja])
+
+  @@map("transferencia_caja")
+}
