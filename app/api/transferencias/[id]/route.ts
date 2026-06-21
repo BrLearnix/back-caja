@@ -14,6 +14,8 @@ import {
   rechazarTransferencia,
 } from "@/lib/models/transferencia-caja";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

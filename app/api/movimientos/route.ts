@@ -17,6 +17,8 @@ import {
 import { getCajaById } from "@/lib/models/caja";
 import { getTipoMovimientoById } from "@/lib/models/tipo-movimiento";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

@@ -11,6 +11,8 @@ import {
   createAnioFiscal,
 } from "@/lib/models/anio-fiscal";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const anios = await getAllAniosFiscales();

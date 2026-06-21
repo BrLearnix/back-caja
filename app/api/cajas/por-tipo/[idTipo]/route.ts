@@ -7,6 +7,8 @@ import {
 } from "@/lib/api-response";
 import { getCajasByTipo } from "@/lib/models/caja";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ idTipo: string }> }

@@ -13,6 +13,8 @@ import {
   deleteAnioFiscal,
 } from "@/lib/models/anio-fiscal";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

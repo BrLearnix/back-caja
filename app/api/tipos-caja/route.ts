@@ -11,6 +11,8 @@ import {
   createTipoCaja,
 } from "@/lib/models/tipo-caja";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const tipos = await getAllTiposCaja();

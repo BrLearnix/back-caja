@@ -7,7 +7,8 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const url = new URL(process.env.DATABASE_URL!);
+  const dbUrl = process.env.DATABASE_URL ?? "mysql://dummy:dummy@localhost:3306/dummy";
+  const url = new URL(dbUrl);
 
   const adapter = new PrismaMariaDb({
     host: url.hostname,

@@ -11,6 +11,8 @@ import {
   createTipoMovimiento,
 } from "@/lib/models/tipo-movimiento";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const tipos = await getAllTiposMovimiento();
